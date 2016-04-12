@@ -53,19 +53,21 @@ windowed_data_std_mean = mean(windowed_data_std , 2);
 % title(['Sample ', num2str(i)]);
 % axis([0,stddata_size, 0, 40]);
 % end
-%% Gaussian Mixture Distribution
-fignum = 9;
-figure(fignum);
-data_1 = windowed_data_std(:,1)*10 %To increased tabulation resolution, multiply by 10
-tabulated = tabulate(round(data_1)); 
-bar(tabulated(:,1),tabulated(:,3)/100);
-hold on;
-GMModel = fitgmdist(data_1(:,1),2);
-plot(tabulated(:,1),pdf(GMModel,tabulated(:,1)));
-figure(fignum+1);
-data_2 = windowed_data_std(:,2)*10 %To increased tabulation resolution, multiply by 10
-tabulated = tabulate(round(data_2)); 
-bar(tabulated(:,1),tabulated(:,3)/100);
-hold on;
-GMModel = fitgmdist(data_2(:,1),2);
-plot(tabulated(:,1),pdf(GMModel,tabulated(:,1)));
+for chn = 1 : channel
+    %% Gaussian Mixture Distribution
+    fignum = chn;
+    figure(fignum);
+    clf(chn);
+    % Set Initial Condition
+    Sigma(:,:,1) = 100;
+    Sigma(:,:,2) = 5;
+    initialOption = struct('mu',[20;100],'Sigma',Sigma,'ComponentProportion',[0.3,0.7]);
+    % Tabulate it
+    drawdata = windowed_data_std(:,chn)*10; %To increased tabulation resolution, multiply by 10
+    tabulated = tabulate(round(drawdata)); 
+    bar(tabulated(:,1),tabulated(:,3)/100,'FaceColor','k');
+    hold on;
+    GMModel = fitgmdist(drawdata(:,1),2);
+    plot(tabulated(:,1),pdf(GMModel,tabulated(:,1)),'Color','r','LineWidth',1);
+    axis([0,300,0,0.025]);
+end
